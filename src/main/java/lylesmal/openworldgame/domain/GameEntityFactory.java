@@ -30,6 +30,17 @@ public class GameEntityFactory implements EntityFactory {
                 .zIndex(10)
                 .buildAndAttach();
     }
+    @Spawns("enemy")
+    public Entity createEnemy() {
+        return new EntityBuilder()
+                .type(GameEntityTypes.ENEMY)
+                .at(75,450)
+                .view("character.png")
+                .bbox(new HitBox("CHARACTER", BoundingShape.box(16, 16)))
+                .with(new CollidableComponent(true))
+                .zIndex(10)
+                .buildAndAttach();
+    }
 
     @Spawns("loot")
     public Entity createLoot(double x, double y) {

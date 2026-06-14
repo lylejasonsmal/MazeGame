@@ -25,6 +25,7 @@ import static com.almasb.fxgl.dsl.FXGLForKtKt.image;
 
 public class MapApplication extends GameApplication {
     private Entity player;
+    private Entity enemyPlayer;
     private Entity wall;
     private Entity cannon;
     private Entity brick;
@@ -42,7 +43,8 @@ public class MapApplication extends GameApplication {
     private String previousImage;
     Font font = new Font(Helper.fontName, 14);
 
-    Point2D oldPos;
+    Point2D playerPreviousLocation;
+    Point2D enemyPlayerPreviousLocation;
 
     boolean isGrootSpawned = false;
 
@@ -80,7 +82,7 @@ public class MapApplication extends GameApplication {
         vars.put("steps", 0);
     }
 
-    private GameEntityOrientation playerOrientation = GameEntityOrientation.EAST;
+    private GameEntityOrientation playerOrientation = GameEntityOrientation.SOUTH;
     @Override
     protected void initInput() {
         double moveYSpeed = 1.5;
@@ -214,8 +216,10 @@ public class MapApplication extends GameApplication {
         play("game-music.mp3");
         generateMap("map.png");
 
-        spawnCharacter();
-        oldPos = player.getPosition();
+        spawnMainCharacter();
+        spawnEnemyCharacter();
+        moveEnemyTowardsPlayer();
+        playerPreviousLocation = player.getPosition();
     }
 
     @Override
@@ -352,10 +356,58 @@ public class MapApplication extends GameApplication {
     }
 
     //This method spawns your character
-    private void spawnCharacter() {
+    private void spawnMainCharacter() {
         player = gameEntity.createCharacter();
         followCharacter(true);
     }
+
+    //This method spawns an enemy character
+    private void spawnEnemyCharacter() {
+        enemyPlayer = gameEntity.createEnemy();
+    }
+
+    //TODO: Make this a helper method that can be used for any entity to move towards another entity
+    private void moveEnemyTowardsPlayer() {
+        getGameTimer().runAtInterval(() -> {
+            double deltaX = player.getX() - enemyPlayer.getX();
+            double deltaY = player.getY() - enemyPlayer.getY();
+            double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (distance > 10 && distance < 100) {
+                double moveX = (deltaX / distance) * 4.0; // Adjust speed as needed
+                double moveY = (deltaY / distance) * 4.0; // Adjust speed as needed
+
+                enemyPlayer.translateX(moveX);
+                enemyPlayer.translateY(moveY);
+                HandleEnemyPlayerInRestrictedArea(enemyPlayer);
+                //change the animatedChannel based on the direction the enemy is moving towards
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (deltaX > 0) {
+                        handleEnemyMovementAnimations("character-right.png");
+                    } else {
+                        handleEnemyMovementAnimations("character-left.png");
+                    }
+                } else {
+                    if (deltaY > 0) {
+                        handleEnemyMovementAnimations("character-down.png");
+                    } else {
+                        handleEnemyMovementAnimations("character-up.png");
+                    }
+                }
+            }
+
+            int hp = getWorldProperties().intProperty("hp").get();
+            if(distance <= 10 & hp >= 0 ){
+                play("damage.mp3");
+                inc("hp", -1);
+                if (hp == 0){
+                    player.removeFromWorld();
+                    play("death.mp3");
+                }
+            }
+        }, Duration.seconds(0.1));
+    }
+
 
     private int nextFrameIndex = 0;
     //This method handles character animations
@@ -370,6 +422,28 @@ public class MapApplication extends GameApplication {
 
         player.getViewComponent().clearChildren();
         player.getViewComponent().addChild(texture);
+
+        if(nextFrameIndex <= 4){
+            nextFrameIndex++;
+        }
+        else{
+            nextFrameIndex = 0;
+        }
+
+        previousImage = fileName;
+    }
+    //This method handles character animations
+    public void handleEnemyMovementAnimations(String fileName){
+        Image image = image(fileName);
+
+        AnimationChannel channel = new AnimationChannel(image, 4, 16, 32, Duration.seconds(1.5), 0, 3);
+
+        //Create the animated texture
+        AnimatedTexture texture = new AnimatedTexture(channel);
+        texture.playFrom(nextFrameIndex);
+
+        enemyPlayer.getViewComponent().clearChildren();
+        enemyPlayer.getViewComponent().addChild(texture);
 
         if(nextFrameIndex <= 4){
             nextFrameIndex++;
@@ -446,7 +520,6 @@ public class MapApplication extends GameApplication {
         }
     }
 
-
     //The method spawns an animated object
     private void spawnAnimatedObject(double x, double y, String fileName, int frames, int frameWidth, int frameHeight) {
         animatedObject = gameEntity.createStationaryAnimatedObject(x, y, fileName, frames, frameWidth, frameHeight);
@@ -462,9 +535,24 @@ public class MapApplication extends GameApplication {
                 );
 
         if (inRestrictedArea) {
-            player.setPosition(oldPos);
+            player.setPosition(playerPreviousLocation);
         } else {
-            oldPos = player.getPosition();
+            playerPreviousLocation = player.getPosition();
+        }
+    }
+
+    private void HandleEnemyPlayerInRestrictedArea(Entity player) {
+        boolean inRestrictedArea = getGameWorld().getEntitiesByType(GameEntityTypes.WALL,GameEntityTypes.BRICK)
+                .stream()
+                .anyMatch(land ->
+                        enemyPlayer.getBoundingBoxComponent()
+                                .isCollidingWith(land.getBoundingBoxComponent())
+                );
+
+        if (inRestrictedArea) {
+            player.setPosition(enemyPlayerPreviousLocation);
+        } else {
+            enemyPlayerPreviousLocation = player.getPosition();
         }
     }
 
