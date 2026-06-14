@@ -7,46 +7,37 @@ import com.almasb.fxgl.physics.CollisionHandler;
 import com.almasb.fxgl.physics.PhysicsWorld;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-import lylesmal.openworldgame.domain.GameEntityFactory;
-import lylesmal.openworldgame.domain.GameEntityOrientation;
-import lylesmal.openworldgame.domain.GameEntityTypes;
+import lylesmal.openworldgame.domain.*;
 import lylesmal.openworldgame.util.Helper;
-import java.util.Map;
-import java.util.Random;
+
+import java.util.*;
 import static com.almasb.fxgl.dsl.FXGL.*;
 import static com.almasb.fxgl.dsl.FXGLForKtKt.image;
 
 public class MapApplication extends GameApplication {
-    private Entity player;
-    private Entity enemyPlayer;
+    private MazeGameCharacterEntity controllablePlayer;
+    private final List<MazeGameCharacterEntity> zombies = new ArrayList<>();
     private Entity wall;
     private Entity cannon;
     private Entity brick;
     private Entity animatedObject;
     private GameEntityFactory gameEntity;
     private final int yValue;
-    private Text txtPlayerHP;
-    private Text lblPlayerHP;
-    private Text txtScore;
-    private Text lblScore;
-    private Text txtSteps;
-    private Text lblSteps;
-    private Text txtXPos;
-    private Text txtYPos;
-    private String previousImage;
+    private final Text txtPlayerHP;
+    private final Text lblPlayerHP;
+    private final Text txtScore;
+    private final Text lblScore;
+    private final Text txtSteps;
+    private final Text lblSteps;
+    private final Text txtXPos;
+    private final Text txtYPos;
     Font font = new Font(Helper.fontName, 14);
-
-    Point2D playerPreviousLocation;
-    Point2D enemyPlayerPreviousLocation;
-
-    boolean isGrootSpawned = false;
 
     public MapApplication() {
         gameEntity = new GameEntityFactory();
@@ -82,63 +73,43 @@ public class MapApplication extends GameApplication {
         vars.put("steps", 0);
     }
 
-    private GameEntityOrientation playerOrientation = GameEntityOrientation.SOUTH;
     @Override
     protected void initInput() {
-        double moveYSpeed = 1.5;
-        double moveXSpeed = 1.5;
-
         //Player navigation
         getInput().addAction(new UserAction("player-move-up") {
             @Override
             protected void onAction() {
-                HandlePlayerInRestrictedArea(player);
-                updatePlayerPosition(player, GameEntityOrientation.NORTH);
-
-                player.translateY(-moveYSpeed);
-                handleCharacterMovementAnimations("character-up.png");
+                MovePlayer(GameEntityOrientation.NORTH);
             }
         }, KeyCode.UP);
 
         getInput().addAction(new UserAction("player-move-down") {
             @Override
             protected void onAction() {
-                HandlePlayerInRestrictedArea(player);
-                updatePlayerPosition(player, GameEntityOrientation.SOUTH);
-
-                player.translateY(moveYSpeed);
-                handleCharacterMovementAnimations("character-down.png");
+                MovePlayer(GameEntityOrientation.SOUTH);
             }
         }, KeyCode.DOWN);
 
         getInput().addAction(new UserAction("player-move-left") {
             @Override
             protected void onAction() {
-                HandlePlayerInRestrictedArea(player);
-                updatePlayerPosition(player, GameEntityOrientation.WEST);
-
-                player.translateX(-moveXSpeed);
-                handleCharacterMovementAnimations("character-left.png");
+                MovePlayer(GameEntityOrientation.WEST);
             }
         }, KeyCode.LEFT);
 
         getInput().addAction(new UserAction("player-move-right") {
             @Override
             protected void onAction() {
-                HandlePlayerInRestrictedArea(player);
-                updatePlayerPosition(player, GameEntityOrientation.EAST);
-
-                player.translateX(moveXSpeed);
-                handleCharacterMovementAnimations("character-right.png");
+                MovePlayer(GameEntityOrientation.EAST);
             }
         }, KeyCode.RIGHT);
 
         getInput().addAction(new UserAction("player-jump") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
-                player.translateY(-10);
-                getGameTimer().runOnceAfter(() -> player.translateY(10), Duration.seconds(0.2));
+                HandlePlayerInRestrictedArea(controllablePlayer);
+                controllablePlayer.getCharacterEntity().translateY(-10);
+                getGameTimer().runOnceAfter(() -> controllablePlayer.getCharacterEntity().translateY(10), Duration.seconds(0.2));
             }
         }, KeyCode.SPACE);
 
@@ -146,89 +117,99 @@ public class MapApplication extends GameApplication {
         getInput().addAction(new UserAction("player-spawns-brick") {
             @Override
             protected void onActionBegin() {
-                spawnBrick(Helper.fixEntityToGrid(player).getX(), Helper.fixEntityToGrid(player).getY(), "brick.png");
-                HandlePlayerInRestrictedArea(player);
+                PlaceBrick();
             }
         }, KeyCode.W);
 
         getInput().addAction(new UserAction("player-spawns-flag") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
-                spawnAnimatedObject(Helper.fixEntityToGrid(player).getX(), Helper.fixEntityToGrid(player).getY(), "flag.png", 4,32, 32);
+                HandlePlayerInRestrictedArea(controllablePlayer);
+                SpawnAnimatedObject(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY(), "flag.png", 4,32, 32);
             }
         }, KeyCode.Z);
 
         getInput().addAction(new UserAction("player-spawns-bullet") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
-                spawnCharacterBullet();
+                HandlePlayerInRestrictedArea(controllablePlayer);
+                shootBullet();
             }
         }, KeyCode.F);
 
         getInput().addAction(new UserAction("player-spawns-fence-vertical") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
-                spawnStationaryObject(Helper.fixEntityToGrid(player).getX(), Helper.fixEntityToGrid(player).getY(), "fence-vertical.png");
+                HandlePlayerInRestrictedArea(controllablePlayer);
+                spawnStationaryObject(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY(), "fence-vertical.png");
             }
         }, KeyCode.V);
 
         getInput().addAction(new UserAction("player-spawns-fence-horizontal") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
-                spawnStationaryObject(Helper.fixEntityToGrid(player).getX(), Helper.fixEntityToGrid(player).getY(), "fence-horizontal.png");
+                HandlePlayerInRestrictedArea(controllablePlayer);
+                spawnStationaryObject(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY(), "fence-horizontal.png");
             }
         }, KeyCode.H);
 
         getInput().addAction(new UserAction("player-plants") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
-                String plants[] = {"shrubs.png", "strawberries.png", "granadilla.png"};
+                HandlePlayerInRestrictedArea(controllablePlayer);
+                String[] plants = {"shrubs.png", "strawberries.png", "granadilla.png"};
 
-                spawnPlants(Helper.fixEntityToGrid(player).getX(), Helper.fixEntityToGrid(player).getY(), plants[random(0, 2)]);
+                spawnPlants(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY(), plants[random(0, 2)]);
             }
         }, KeyCode.P);
 
         getInput().addAction(new UserAction("player-spawns-cannon") {
             @Override
             protected void onActionBegin() {
-                HandlePlayerInRestrictedArea(player);
+                HandlePlayerInRestrictedArea(controllablePlayer);
 
-                spawnCannon(Helper.fixEntityToGrid(player).getX(), Helper.fixEntityToGrid(player).getY());
+                spawnCannon(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY());
             }
         }, KeyCode.C);
 
-//        getInput().addAction(new UserAction("player-picks-up-flag") {
-//            @Override
-//            protected void onActionBegin() {
-//                isPlayerInRestrictedArea(player);
-//                pickUpFlags();
-//            }
-//        }, KeyCode.R);
+        getInput().addAction(new UserAction("player-bombs") {
+            @Override
+            protected void onActionBegin() {
+                play("bomb.wav");
+                play("zombie_groan.wav");
+                Iterator<MazeGameCharacterEntity> listOfCurrentZombies = zombies.iterator();
+                while (listOfCurrentZombies.hasNext()) {
+                    MazeGameCharacterEntity zombie = listOfCurrentZombies.next();
+                    Entity zombieEntity = zombie.getCharacterEntity();
+                    double deltaX = controllablePlayer.getCharacterEntity().getX() - zombieEntity.getX();
+                    double deltaY = controllablePlayer.getCharacterEntity().getY() - zombieEntity.getY();
+                    double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    if (distance < 150){
+                        inc("score", +10);
+                        zombieEntity.removeFromWorld();
+                        listOfCurrentZombies.remove();
+                    }
+                }
+            }
+        }, KeyCode.B);
     }
 
     @Override
     protected void initGame() {
         play("game-music.mp3");
-        generateMap("map.png");
+        generateMap();
 
         spawnMainCharacter();
-        spawnEnemyCharacter();
-        moveEnemyTowardsPlayer();
-        playerPreviousLocation = player.getPosition();
+        SpawnZombies();
+        ZombiesFollowAndAttackAlgorithm();
     }
 
     @Override
     protected void initUI() {
-
         lblPlayerHP.setText("HP: ");
         lblPlayerHP.setFont(font);
-        lblPlayerHP.setX(10);
-        lblPlayerHP.setY(yValue);
+        lblPlayerHP.setX(controllablePlayer.getCharacterEntity().getX());
+        lblPlayerHP.setY(controllablePlayer.getCharacterEntity().getY());
 
         txtPlayerHP.setFont(font);
         txtPlayerHP.setTranslateX(60);
@@ -252,7 +233,7 @@ public class MapApplication extends GameApplication {
         txtSteps.setTranslateX(360);
         txtSteps.setTranslateY(yValue);
 
-        updatePlayerPosition(player, playerOrientation);
+        UpdatePlayerPosition(controllablePlayer, controllablePlayer.getOrientation());
         txtXPos.setFont(font);
         txtXPos.setTranslateX(10);
         txtXPos.setTranslateY(10);
@@ -291,7 +272,7 @@ public class MapApplication extends GameApplication {
     @Override
     protected void initPhysics() {
         PhysicsWorld physicsWorld = getPhysicsWorld();
-        physicsWorld.addCollisionHandler(new CollisionHandler(GameEntityTypes.PLAYER, GameEntityTypes.LOOT) {
+        physicsWorld.addCollisionHandler(new CollisionHandler(GameEntityTypes.CONTROLLABLE_PLAYER, GameEntityTypes.LOOT) {
             @Override
             protected void onCollisionBegin(Entity player, Entity loot) {
                 play("loot-pick-up.wav");
@@ -299,13 +280,39 @@ public class MapApplication extends GameApplication {
                 inc("score", +5);
             }
         });
+
+        physicsWorld.addCollisionHandler(new CollisionHandler(GameEntityTypes.ZOMBIE, GameEntityTypes.BULLET) {
+            @Override
+            protected void onCollisionBegin(Entity zombie, Entity bullet) {
+                bullet.removeFromWorld();
+                HandleZombieHit(zombie);
+            }
+        });
+    }
+
+    //This method damages the zombie that was hit by a bullet and removes it once its health is depleted
+    private void HandleZombieHit(Entity zombieEntity) {
+        String entityId = zombieEntity.getString(MazeGameCharacterEntity.ENTITY_ID_PROPERTY);
+        zombies.stream()
+                .filter(zombie -> zombie.getEntityId().equals(entityId))
+                .findFirst()
+                .ifPresent(zombie -> {
+                    zombie.takeDamage(5);
+                    play("damage.wav");
+                    if (zombie.isDead()) {
+                        zombie.getCharacterEntity().removeFromWorld();
+                        zombies.remove(zombie);
+                        play("death.wav");
+                        inc("score", +10);
+                    }
+                });
     }
 
     //This method generates a map
-    private void generateMap(String fileName) {
+    private void generateMap() {
         entityBuilder()
                 .at(0, 0)
-                .view(texture(fileName, 800, 640)) // adjust size to match your large map
+                .view(texture("map.png", 800, 640)) // adjust size to match your large map
                 .buildAndAttach();
 
         spawnLootBox();
@@ -324,90 +331,95 @@ public class MapApplication extends GameApplication {
         spawnStationaryObject(624, 480, "wall-2.png");
         spawnStationaryObject(176, 160, "island-wall.png");
         spawnStationaryObject(320, 160, "wall-2.png");
-        spawnAnimatedObject(224, 192, "water-fountain.png", 3,48, 48);
-        spawnAnimatedObject(672, 64, "pond.png", 2,64, 64);
+        SpawnAnimatedObject(224, 192, "water-fountain.png", 3,48, 48);
+        SpawnAnimatedObject(672, 64, "pond.png", 2,64, 64);
 
-        spawnAnimatedObject(0, 0, "waves.png", 5,160, 32);
-        spawnAnimatedObject(160, 0, "waves.png", 4,160, 32);
-        spawnAnimatedObject(320, 0, "waves.png", 4,160, 32);
-        spawnAnimatedObject(480, 0, "waves.png", 3,160, 32);
-        spawnAnimatedObject(640, 0, "waves.png", 3,160, 32);
+        SpawnAnimatedObject(0, 0, "waves.png", 5,160, 32);
+        SpawnAnimatedObject(160, 0, "waves.png", 4,160, 32);
+        SpawnAnimatedObject(320, 0, "waves.png", 4,160, 32);
+        SpawnAnimatedObject(480, 0, "waves.png", 3,160, 32);
+        SpawnAnimatedObject(640, 0, "waves.png", 3,160, 32);
 
-        spawnAnimatedObject(0, 608, "waves.png", 5,160, 32);
-        spawnAnimatedObject(160, 608, "waves.png", 4,160, 32);
-        spawnAnimatedObject(320, 608, "waves.png", 4,160, 32);
-        spawnAnimatedObject(480, 608, "waves.png", 3,160, 32);
-        spawnAnimatedObject(640, 608, "waves.png", 3,160, 32);
+        SpawnAnimatedObject(0, 608, "waves.png", 5,160, 32);
+        SpawnAnimatedObject(160, 608, "waves.png", 4,160, 32);
+        SpawnAnimatedObject(320, 608, "waves.png", 4,160, 32);
+        SpawnAnimatedObject(480, 608, "waves.png", 3,160, 32);
+        SpawnAnimatedObject(640, 608, "waves.png", 3,160, 32);
 
         spawnStationaryObject(0,32, "no-waves.png");
         spawnStationaryObject(768,32, "no-waves.png");
     }
 
     //This method ensures the character can explore the entire map while remaining in the viewport
-    private void followCharacter(boolean isFollowing) {
-        if (isFollowing) {
-            double distanceX = getAppWidth() / 2.0 - player.getWidth() / 2.0;
-            double distanceY = getAppHeight() / 2.0 - player.getHeight() / 2.0;
+    private void followMainCharacter() {
+        double distanceX = getAppWidth() / 2.0 - controllablePlayer.getCharacterEntity().getWidth() / 2.0;
+        double distanceY = getAppHeight() / 2.0 - controllablePlayer.getCharacterEntity().getHeight() / 2.0;
 
-            getGameScene().getViewport().bindToEntity(player, distanceX, distanceY);
-            getGameScene().getViewport().setBounds(0, 0, 800, 640);
-            getGameScene().getViewport().setLazy(true);
-        }
+        getGameScene().getViewport().bindToEntity(controllablePlayer.getCharacterEntity(), distanceX, distanceY);
+        getGameScene().getViewport().setBounds(0, 0, 800, 640);
+        getGameScene().getViewport().setLazy(true);
     }
 
     //This method spawns your character
     private void spawnMainCharacter() {
-        player = gameEntity.createCharacter();
-        followCharacter(true);
+        controllablePlayer = new MazeGameCharacterEntity(gameEntity.createControllablePlayer(), GameEntityOrientation.SOUTH, 0);
+        followMainCharacter();
     }
 
-    //This method spawns an enemy character
-    private void spawnEnemyCharacter() {
-        enemyPlayer = gameEntity.createEnemy();
+    //This method spawns enemy characters
+    private void SpawnZombies() {
+        int zombieSpawnCount = 13;
+        Random random = new Random();
+        while (zombieSpawnCount > 0) {
+            zombies.add(new MazeGameCharacterEntity(gameEntity.createZombieCharacter(random.nextDouble(64, 200), random.nextDouble(350, 500)), GameEntityOrientation.SOUTH, 150));
+            zombieSpawnCount--;
+        }
     }
 
     //TODO: Make this a helper method that can be used for any entity to move towards another entity
-    private void moveEnemyTowardsPlayer() {
+    private void ZombiesFollowAndAttackAlgorithm() {
         getGameTimer().runAtInterval(() -> {
-            double deltaX = player.getX() - enemyPlayer.getX();
-            double deltaY = player.getY() - enemyPlayer.getY();
-            double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            for (MazeGameCharacterEntity zombie : zombies) {
+                double distanceX = controllablePlayer.getCharacterEntity().getX() - zombie.getCharacterEntity().getX();
+                double distanceY = controllablePlayer.getCharacterEntity().getY() - zombie.getCharacterEntity().getY();
+                double distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-            if (distance > 10 && distance < 100) {
-                double moveX = (deltaX / distance) * 4.0; // Adjust speed as needed
-                double moveY = (deltaY / distance) * 4.0; // Adjust speed as needed
+                if (distance <= zombie.getResponseRadius()) {
+                    double moveX = (distanceX / distance) * 2.0;
+                    double moveY = (distanceY / distance) * 2.0;
 
-                enemyPlayer.translateX(moveX);
-                enemyPlayer.translateY(moveY);
-                HandleEnemyPlayerInRestrictedArea(enemyPlayer);
-                //change the animatedChannel based on the direction the enemy is moving towards
-                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    if (deltaX > 0) {
-                        handleEnemyMovementAnimations("character-right.png");
+                    zombie.getCharacterEntity().translateX(moveX);
+                    zombie.getCharacterEntity().translateY(moveY);
+                    HandlePlayerInRestrictedArea(zombie);
+                    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+                        if (distanceX > 0) {
+                            HandleEnemyMovementAnimations(zombie, "character-right.png");
+                        } else {
+                            HandleEnemyMovementAnimations(zombie, "character-left.png");
+                        }
                     } else {
-                        handleEnemyMovementAnimations("character-left.png");
-                    }
-                } else {
-                    if (deltaY > 0) {
-                        handleEnemyMovementAnimations("character-down.png");
-                    } else {
-                        handleEnemyMovementAnimations("character-up.png");
+                        if (distanceY > 0) {
+                            HandleEnemyMovementAnimations(zombie, "character-down.png");
+                        } else {
+                            HandleEnemyMovementAnimations(zombie, "character-up.png");
+                        }
                     }
                 }
-            }
 
-            int hp = getWorldProperties().intProperty("hp").get();
-            if(distance <= 10 & hp >= 0 ){
-                play("damage.mp3");
-                inc("hp", -1);
-                if (hp == 0){
-                    player.removeFromWorld();
-                    play("death.mp3");
+                int hp = getWorldProperties().intProperty("hp").get();
+                if (distance <= 10 & hp >= 0 ) {
+                    if(hp % 5 == 0) {
+                        play("zombie_bite.wav");
+                    }
+                    inc("hp", -1);
+                    if (hp == 0){
+                        controllablePlayer.getCharacterEntity().removeFromWorld();
+                        play("death.wav");
+                    }
                 }
             }
         }, Duration.seconds(0.1));
     }
-
 
     private int nextFrameIndex = 0;
     //This method handles character animations
@@ -420,8 +432,8 @@ public class MapApplication extends GameApplication {
         AnimatedTexture texture = new AnimatedTexture(channel);
         texture.playFrom(nextFrameIndex);
 
-        player.getViewComponent().clearChildren();
-        player.getViewComponent().addChild(texture);
+        controllablePlayer.getCharacterEntity().getViewComponent().clearChildren();
+        controllablePlayer.getCharacterEntity().getViewComponent().addChild(texture);
 
         if(nextFrameIndex <= 4){
             nextFrameIndex++;
@@ -429,11 +441,10 @@ public class MapApplication extends GameApplication {
         else{
             nextFrameIndex = 0;
         }
-
-        previousImage = fileName;
     }
+
     //This method handles character animations
-    public void handleEnemyMovementAnimations(String fileName){
+    public void HandleEnemyMovementAnimations(MazeGameCharacterEntity zombie, String fileName){
         Image image = image(fileName);
 
         AnimationChannel channel = new AnimationChannel(image, 4, 16, 32, Duration.seconds(1.5), 0, 3);
@@ -442,8 +453,8 @@ public class MapApplication extends GameApplication {
         AnimatedTexture texture = new AnimatedTexture(channel);
         texture.playFrom(nextFrameIndex);
 
-        enemyPlayer.getViewComponent().clearChildren();
-        enemyPlayer.getViewComponent().addChild(texture);
+        zombie.getCharacterEntity().getViewComponent().clearChildren();
+        zombie.getCharacterEntity().getViewComponent().addChild(texture);
 
         if(nextFrameIndex <= 4){
             nextFrameIndex++;
@@ -451,8 +462,6 @@ public class MapApplication extends GameApplication {
         else{
             nextFrameIndex = 0;
         }
-
-        previousImage = fileName;
     }
 
     //This method spawns loot boxes every 5-60 seconds
@@ -475,10 +484,10 @@ public class MapApplication extends GameApplication {
     }
 
     //This method spawns a brick
-    private void spawnBrick(double x, double y, String fileName) {
+    private void SpawnBrick(double x, double y) {
         if ((x > 64 && x < 728) && (y > 54 && y < 547)) {
         play("brick.wav");
-        gameEntity.createBrick(x, y, fileName);
+        gameEntity.createBrick(x, y, "brick.png");
         }
     }
 
@@ -490,120 +499,102 @@ public class MapApplication extends GameApplication {
          getGameTimer().runAtInterval(() ->
          spawnBullet(),
          Duration.seconds(2));
-
-         handleBulletImpact();
         }
     }
 
     //This method spawns a bullet
     private void spawnBullet(){
         play("explosion.wav");
-        gameEntity.createBullet(cannon.getRightX()-5, cannon.getY(), 300,+5,0);
+         gameEntity.createBullet(cannon.getRightX()-5, cannon.getY(), 300,+5,0);
     }
 
-
-    private void spawnCharacterBullet(){
+    private void shootBullet(){
         play("explosion.wav");
-        switch (playerOrientation){
+        switch (controllablePlayer.getOrientation()) {
             case EAST:
-                gameEntity.createBullet(player.getX() - 5, player.getY(), 300, +5, 0);
+                gameEntity.createBullet(controllablePlayer.getCharacterEntity().getX() - 5, controllablePlayer.getCharacterEntity().getY(), 300, +5, 0);
                 break;
             case WEST:
-                gameEntity.createBullet(player.getX(), player.getY(), 300, -5, 0);
+                gameEntity.createBullet(controllablePlayer.getCharacterEntity().getX(), controllablePlayer.getCharacterEntity().getY(), 300, -5, 0);
                 break;
             case NORTH:
-                gameEntity.createBullet(player.getX(), player.getY(), 300, 0, -5);
+                gameEntity.createBullet(controllablePlayer.getCharacterEntity().getX(), controllablePlayer.getCharacterEntity().getY(), 300, 0, -5);
                 break;
             case SOUTH:
-                gameEntity.createBullet(player.getX(), player.getY(), 300, 0, +5);
+                gameEntity.createBullet(controllablePlayer.getCharacterEntity().getX(), controllablePlayer.getCharacterEntity().getY(), 300, 0, +5);
                 break;
         }
     }
 
     //The method spawns an animated object
-    private void spawnAnimatedObject(double x, double y, String fileName, int frames, int frameWidth, int frameHeight) {
+    private void SpawnAnimatedObject(double x, double y, String fileName, int frames, int frameWidth, int frameHeight) {
         animatedObject = gameEntity.createStationaryAnimatedObject(x, y, fileName, frames, frameWidth, frameHeight);
     }
 
-
-    private void HandlePlayerInRestrictedArea(Entity player) {
+    private void HandlePlayerInRestrictedArea(MazeGameCharacterEntity character) {
         boolean inRestrictedArea = getGameWorld().getEntitiesByType(GameEntityTypes.WALL,GameEntityTypes.BRICK)
                 .stream()
                 .anyMatch(land ->
-                        player.getBoundingBoxComponent()
+                        character.getCharacterEntity().getBoundingBoxComponent()
                                 .isCollidingWith(land.getBoundingBoxComponent())
                 );
 
         if (inRestrictedArea) {
-            player.setPosition(playerPreviousLocation);
+            character.getCharacterEntity().setPosition(character.getLastRecordedPosition());
         } else {
-            playerPreviousLocation = player.getPosition();
+            character.setLastRecordPosition();
         }
     }
 
-    private void HandleEnemyPlayerInRestrictedArea(Entity player) {
-        boolean inRestrictedArea = getGameWorld().getEntitiesByType(GameEntityTypes.WALL,GameEntityTypes.BRICK)
-                .stream()
-                .anyMatch(land ->
-                        enemyPlayer.getBoundingBoxComponent()
-                                .isCollidingWith(land.getBoundingBoxComponent())
-                );
-
-        if (inRestrictedArea) {
-            player.setPosition(enemyPlayerPreviousLocation);
-        } else {
-            enemyPlayerPreviousLocation = player.getPosition();
+    private void MovePlayer(GameEntityOrientation requestedDirection) {
+        HandlePlayerInRestrictedArea(controllablePlayer);
+        UpdatePlayerPosition(controllablePlayer, requestedDirection);
+        switch (requestedDirection) {
+            case NORTH:
+                controllablePlayer.getCharacterEntity().translateY(-controllablePlayer.playerSpeed);
+                handleCharacterMovementAnimations("character-up.png");
+                break;
+            case SOUTH:
+                controllablePlayer.getCharacterEntity().translateY(controllablePlayer.playerSpeed);
+                handleCharacterMovementAnimations("character-down.png");
+                break;
+            case WEST:
+                controllablePlayer.getCharacterEntity().translateX(-controllablePlayer.playerSpeed);
+                handleCharacterMovementAnimations("character-left.png");
+                break;
+            case EAST:
+                controllablePlayer.getCharacterEntity().translateX(controllablePlayer.playerSpeed);
+                handleCharacterMovementAnimations("character-right.png");
+                break;
         }
     }
 
-//    private void pickUpFlags(){
-//        PhysicsWorld physicsWorld = getPhysicsWorld();
-//        physicsWorld.addCollisionHandler(new CollisionHandler(GameEntityTypes.PLAYER, GameEntityTypes.ANIMATED_OBJECT) {
-//            @Override
-//            protected void onCollisionBegin(Entity player, Entity flag) {
-//                flag.setVisible(false);
-//            }
-//        });
-//    }
-
-    private void handleBulletImpact(){
-        PhysicsWorld physicsWorld = getPhysicsWorld();
-        physicsWorld.addCollisionHandler(new CollisionHandler(GameEntityTypes.WALL, GameEntityTypes.BULLET) {
-            @Override
-            protected void onCollisionBegin(Entity wall, Entity bullet) {
-                play("brick.wav");
-                wall.removeFromWorld();
-                bullet.removeFromWorld();
-            }
-        });
-
-        physicsWorld.addCollisionHandler(new CollisionHandler(GameEntityTypes.PLAYER, GameEntityTypes.BULLET) {
-            @Override
-            protected void onCollisionBegin(Entity player, Entity bullet) {
-                inc("hp", -1);
-                int hp = getWorldProperties().intProperty("hp").get();
-                if (hp == 0){
-                    player.removeFromWorld();
-                }
-                bullet.removeFromWorld();
-            }
-        });
+    private void PlaceBrick(){
+        int space = 16;
+        switch (controllablePlayer.getOrientation()) {
+            case EAST:
+                SpawnBrick((Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX() + space), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY());
+                break;
+            case WEST:
+                SpawnBrick((Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX() - space), Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY());
+                break;
+            case NORTH:
+                SpawnBrick(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), (Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY() - space));
+                break;
+            case SOUTH:
+                SpawnBrick(Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getX(), (Helper.fixEntityToGrid(controllablePlayer.getCharacterEntity()).getY() + space));
+                break;
+        }
     }
 
     //This updates the player coordinates that appear onscreen
-    private void updatePlayerPosition(Entity player, GameEntityOrientation currentOrientation) {
-        if ((player.getX() % 8 == 0) || (player.getY() % 8 == 0)) {
+    private void UpdatePlayerPosition(MazeGameCharacterEntity player, GameEntityOrientation currentOrientation) {
+        if ((player.getCharacterEntity().getX() % 8 == 0) || (player.getCharacterEntity().getY() % 8 == 0)) {
             inc("steps", +1);
         }
-        txtXPos.setText("X: " + (int) player.getX());
-        txtYPos.setText("Y: " + (int) player.getY());
-        playerOrientation = currentOrientation;
-    }
-
-    @Override
-    protected void onUpdate(double tpf){
-     //TODO: Check if the player is moving at a timed interval (e.g 0.5s)
-     //TODO: Stop the moving player animation texture
+        txtXPos.setText("X: " + (int) player.getCharacterEntity().getX());
+        txtYPos.setText("Y: " + (int) player.getCharacterEntity().getY());
+        player.setOrientation(currentOrientation);
     }
 
 }

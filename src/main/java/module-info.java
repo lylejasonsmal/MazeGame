@@ -15,6 +15,8 @@ module lylesmal.openworldgame {
     requires com.almasb.fxgl.all;
     requires libtiled;
     requires java.desktop;
+    requires com.almasb.fxgl.entity;
+    requires javafx.media;
 
     opens lylesmal.openworldgame to javafx.fxml;
     opens assets.textures;

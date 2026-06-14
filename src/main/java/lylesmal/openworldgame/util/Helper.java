@@ -5,7 +5,6 @@ import java.awt.geom.Point2D;
 
 public class Helper {
 
-
     public static String fontName = "Ninja Naruto";
 
     public static Point2D fixEntityToGrid(Entity player){
