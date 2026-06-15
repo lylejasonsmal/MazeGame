@@ -1,0 +1,54 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "open-world.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "grass.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "land-elements.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "land.tsx": {
+            "scaleInDock": 3,
+            "scaleInEditor": 1
+        },
+        "open-world.tmx": {
+            "scale": 2,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 118.5,
+                "y": 200.75
+            }
+        }
+    },
+    "last.imagePath": "C:/Users/prodb/Desktop/Game Development/2D Open World/gfx/gfx",
+    "map.height": 100,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 100,
+    "openFiles": [
+        "open-world.tmx",
+        "land.tsx"
+    ],
+    "project": "2d-open-world.tiled-project",
+    "recentFiles": [
+        "land.tsx",
+        "open-world.tmx",
+        "grass.tsx",
+        "land-elements.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
