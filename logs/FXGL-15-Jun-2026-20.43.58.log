@@ -1,0 +1,122 @@
+20:43:54.850 [AWT-EventQueue-0         ] DEBUG Logger               - Configured Logger
+20:43:54.850 [AWT-EventQueue-0         ] DEBUG GameApplication      - Logging settings
+Title: Dead Acres
+Version: 1.0.0
+Width: 800
+Height: 640
+Fullscreen: false
+Intro: false
+Profiling: false
+Single step:false
+App Mode: DEVELOPER
+Menu Key: ESCAPE
+Stage Style: DECORATED
+Scene Factory: class com.almasb.fxgl.app.scene.SceneFactory
+
+20:43:54.919 [JavaFX Application Thread] DEBUG FXGLApplication      - Initializing FXGL
+20:43:54.922 [JavaFX Application Thread] INFO  Engine               - FXGL-17.3 (30.03.2023 11.49) on WINDOWS (J:21.0.11 FX:21)
+20:43:54.923 [JavaFX Application Thread] DEBUG Engine               - JRE Vendor Name: Microsoft
+20:43:54.923 [JavaFX Application Thread] DEBUG Engine               - Running on OS: Windows 11 version 10.0
+20:43:54.923 [JavaFX Application Thread] DEBUG Engine               - Architecture: amd64
+20:43:54.923 [JavaFX Application Thread] INFO  Engine               - Source code and latest versions at: https://github.com/AlmasB/FXGL
+20:43:54.923 [JavaFX Application Thread] INFO  Engine               -       Ask questions and discuss at: https://github.com/AlmasB/FXGL/discussions
+20:43:54.923 [JavaFX Application Thread] INFO  Engine               -              Join the FXGL chat at: https://gitter.im/AlmasB/FXGL
+20:43:54.977 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Creating a JavaFX scene
+20:43:55.001 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Target settings size: 800.0 x 640.0
+20:43:55.001 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled scene size:    800.0 x 640.0
+20:43:55.002 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled ratio: (1.0, 1.0)
+20:43:55.002 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Set initial scene to FXGLStartupScene
+20:43:55.004 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Opening main window
+20:43:55.061 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Window border size: (16.0, 39.0)
+20:43:55.062 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled size: 800.0 x 640.0
+20:43:55.062 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled ratio: (1.0, 1.0)
+20:43:55.062 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scene size: 800.0 x 640.0
+20:43:55.062 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Stage size: 816.0 x 679.0
+20:43:55.068 [FXGL Background Thread 1 ] DEBUG Engine               - Initializing environment variables
+20:43:55.111 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - User app class for loading assets: class lylesmal.openworldgame.PlayDeadAcres
+20:43:55.111 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Applying CSS: fxgl_dark.css
+20:43:55.112 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/css/fxgl_dark.css
+20:43:55.156 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Initializing application scenes
+20:43:55.177 [FXGL Background Thread 1 ] DEBUG GameWorld            - Game world initialized
+20:43:55.251 [FXGL Background Thread 1 ] DEBUG PhysicsWorld         - Physics world initialized: appHeight=640, physics.ppm=50,0
+20:43:55.252 [FXGL Background Thread 1 ] DEBUG PhysicsWorld         - Using strategy: BRUTE_FORCE
+20:43:55.255 [FXGL Background Thread 1 ] DEBUG GameScene            - Game scene initialized: 800x640
+20:43:55.262 [FXGL Background Thread 1 ] DEBUG FXGL.DefaultMenu     - createMenuBodyGameMenu()
+20:43:55.273 [FXGL Background Thread 1 ] DEBUG FXGL.DefaultMenu     - createOptionsMenu()
+20:43:55.281 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/textures/particles/smoke.png
+20:43:55.370 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/textures/particles/trace_horizontal.png
+20:43:55.403 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Application scenes initialized
+20:43:55.416 [FXGL Background Thread 1 ] DEBUG SystemBundleService  - Loading FXGL system data
+20:43:55.419 [FXGL Background Thread 1 ] DEBUG FileSystemAccess     - Reading from: C:\Users\lyle\IdeaProjects\MazeGame\system\fxgl.bundle
+20:43:55.425 [FXGL Background Thread 1 ] DEBUG SystemBundleService  - Bundle FXGL: {}
+20:43:55.425 [FXGL Background Thread 1 ] DEBUG UpdaterService       - Checking for updates
+20:43:55.429 [FXGL Background Thread 4 ] DEBUG FXGLApplication      - Loading fonts
+20:43:55.429 [FXGL Background Thread 1 ] DEBUG FXGLApplication      - Loading default localization
+20:43:55.429 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/VarelaRound-Regular.ttf
+20:43:55.430 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/languages/english.lang
+20:43:55.465 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/Abel-Regular.ttf
+20:43:55.467 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/TerminalLandMono-Regular.otf
+20:43:55.468 [FXGL Background Thread 1 ] INFO  FXGLApplication      - FXGL initialization took: 0,400 sec
+20:43:55.470 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/Courier-Prime.ttf
+20:43:55.478 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-move-up - Up
+20:43:55.479 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-move-down - Down
+20:43:55.479 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-move-left - Left
+20:43:55.479 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-move-right - Right
+20:43:55.479 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-jump - Space
+20:43:55.480 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-spawns-brick - W
+20:43:55.480 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-spawns-flag - Z
+20:43:55.481 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-spawns-bullet - F
+20:43:55.481 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-spawns-fence-vertical - V
+20:43:55.482 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-spawns-fence-horizontal - H
+20:43:55.482 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-plants - P
+20:43:55.483 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-spawns-cannon - C
+20:43:55.483 [JavaFX Application Thread] DEBUG Input                - Registered new binding: player-bombs - B
+20:43:55.483 [JavaFX Application Thread] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/island-wall.png
+20:43:55.496 [JavaFX Application Thread] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:///C:/Users/lyle/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/textures/fxgl_default_cursor.png
+20:43:55.499 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Screenshot - CTRL+8
+20:43:55.500 [JavaFX Application Thread] DEBUG Input                - Registered new binding: System info dump - CTRL+9
+20:43:55.500 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Restart - CTRL+R
+20:43:55.501 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Toggle Debug Camera - CTRL+7
+20:43:55.504 [JavaFX Application Thread] DEBUG LoopRunner           - Starting loop
+20:43:55.504 [JavaFX Application Thread] DEBUG LoopRunner           - Initializing JavaFX AnimationTimerLoop
+20:43:55.506 [JavaFX Application Thread] DEBUG GameApplicationServi - Starting new game
+20:43:55.506 [JavaFX Application Thread] DEBUG Input                - Clearing active input actions
+20:43:55.521 [JavaFX Application Thread] DEBUG GameApplicationServi - Removing overlay from FXGLStartupScene and adding to FXGLLoadingScene
+20:43:55.522 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - FXGLStartupScene -> FXGLLoadingScene
+20:43:55.522 [JavaFX Application Thread] DEBUG GameApplicationServi - Clearing previous game
+20:43:55.522 [JavaFX Application Thread] DEBUG GameScene            - Clearing game scene
+20:43:55.522 [JavaFX Application Thread] DEBUG GameWorld            - Clearing game world
+20:43:55.522 [JavaFX Application Thread] DEBUG PhysicsWorld         - Clearing physics world
+20:43:55.524 [FXGL Background Thread 4 ] DEBUG FXGLApplication      - Initializing game
+20:43:55.526 [JavaFX Application Thread] DEBUG FXGLApplication      - Registering font factories with UI factory
+20:43:55.526 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/music/game-music.mp3
+20:43:55.638 [FXGL Background Thread 4 ] DEBUG AudioPlayer          - Playing music com.almasb.fxgl.audio.Music@74b10eea
+20:43:55.640 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/map.png
+20:43:55.673 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/left-border.png
+20:43:55.691 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/right-border.png
+20:43:55.694 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/bottom-top-border.png
+20:43:55.697 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/wall.png
+20:43:55.701 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/wall-2.png
+20:43:55.706 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/wall-1.png
+20:43:55.711 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/water-fountain.png
+20:43:55.739 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/pond.png
+20:43:55.742 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/waves.png
+20:43:55.749 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/no-waves.png
+20:43:55.756 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/character.png
+20:43:55.768 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/ARROWUP.png
+20:43:55.769 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/ARROWLEFT.png
+20:43:55.770 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/ARROWDOWN.png
+20:43:55.770 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/C:/Users/lyle/IdeaProjects/MazeGame/target/classes/assets/textures/ARROWRIGHT.png
+20:43:55.771 [FXGL Background Thread 4 ] INFO  FXGLApplication      - Game initialization took: 0,246 sec
+20:43:55.771 [JavaFX Application Thread] DEBUG Input                - Clearing active input actions
+20:43:55.781 [JavaFX Application Thread] DEBUG GameApplicationServi - Removing overlay from FXGLLoadingScene and adding to GameScene
+20:43:55.782 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - FXGLLoadingScene -> GameScene
+20:43:55.899 [FXGL Background Thread 2 ] INFO  UpdaterService       - Your current version:  17.3
+20:43:55.899 [FXGL Background Thread 2 ] INFO  UpdaterService       - Latest stable version: 25
+20:43:57.998 [JavaFX Application Thread] DEBUG FXGLApplication      - Exiting FXGL
+20:43:57.998 [JavaFX Application Thread] DEBUG LoopRunner           - Stopping loop
+20:43:57.998 [JavaFX Application Thread] DEBUG SystemBundleService  - Saving FXGL system data
+20:43:57.999 [JavaFX Application Thread] DEBUG FileSystemAccess     - Writing to: C:\Users\lyle\IdeaProjects\MazeGame\system\fxgl.bundle
+20:43:58.001 [JavaFX Application Thread] DEBUG Async                - Shutting down background threads
+20:43:58.002 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Closing main window
+20:43:58.012 [JavaFX Application Thread] DEBUG Logger               - Closing Logger

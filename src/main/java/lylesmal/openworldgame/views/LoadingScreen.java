@@ -1,7 +1,8 @@
 package lylesmal.openworldgame.views;
 
 import com.almasb.fxgl.app.GameApplication;
-import lylesmal.openworldgame.MapApplication;
+import lylesmal.openworldgame.PlayDeadAcres;
+import lylesmal.openworldgame.domain.classification.DeadAcresVariable;
 import lylesmal.openworldgame.util.Helper;
 
 import javax.swing.*;
@@ -27,14 +28,12 @@ public class LoadingScreen extends JFrame {
     ImageIcon iconImg = new ImageIcon(getClass().getResource("/assets/textures/island-wall.png"));
 
     public LoadingScreen() {
-        super("a-Mazed™");
+        super(DeadAcresVariable.GameTitle +"™");
         Image logoImg = iconImg.getImage().getScaledInstance(250, 250, Image.SCALE_SMOOTH);
         ImageIcon logoIcon = new ImageIcon(logoImg);
 
         logo = new JLabel(logoIcon);
-
-
-        gameName = new JLabel("a-Mazed");
+        gameName = new JLabel(DeadAcresVariable.GameTitle);
         gameName.setForeground(Color.WHITE);
         gameName.setFont(font_2);
 
@@ -62,7 +61,7 @@ public class LoadingScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                GameApplication.launch(MapApplication.class, args);
+                GameApplication.launch(PlayDeadAcres.class, args);
             }
         });
 

@@ -5,6 +5,7 @@ import com.almasb.fxgl.dsl.components.ProjectileComponent;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.EntityFactory;
 import com.almasb.fxgl.entity.Spawns;
+import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.physics.BoundingShape;
 import com.almasb.fxgl.physics.HitBox;
@@ -13,16 +14,17 @@ import com.almasb.fxgl.texture.AnimationChannel;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
+import lylesmal.openworldgame.domain.classification.DeadAcresEntityType;
 
 import static com.almasb.fxgl.dsl.FXGL.play;
 import static com.almasb.fxgl.dsl.FXGLForKtKt.image;
 
-public class GameEntityFactory implements EntityFactory {
+public class BaseGameEntityFactory implements EntityFactory {
 
     @Spawns("player")
     public Entity createControllablePlayer() {
         return new EntityBuilder()
-                .type(GameEntityTypes.CONTROLLABLE_PLAYER)
+                .type(DeadAcresEntityType.CONTROLLABLE_PLAYER)
                 .at(75,60)
                 .view("character.png")
                 .bbox(new HitBox("PLAYER", BoundingShape.box(16, 16)))
@@ -33,7 +35,7 @@ public class GameEntityFactory implements EntityFactory {
     @Spawns("zombie")
     public Entity createZombieCharacter(double x, double y) {
         return new EntityBuilder()
-                .type(GameEntityTypes.ZOMBIE)
+                .type(DeadAcresEntityType.ZOMBIE)
                 .at(x, y)
                 .view("character.png")
                 .bbox(new HitBox("CHARACTER", BoundingShape.box(16, 16)))
@@ -45,7 +47,7 @@ public class GameEntityFactory implements EntityFactory {
     @Spawns("loot")
     public Entity createLoot(double x, double y) {
         return new EntityBuilder()
-                .type(GameEntityTypes.LOOT)
+                .type(DeadAcresEntityType.LOOT)
                 .at(x, y)
                 .viewWithBBox("loot.png")
                 .with(new CollidableComponent(true))
@@ -56,7 +58,7 @@ public class GameEntityFactory implements EntityFactory {
     public Entity createCannon(double x, double y) {
 
         return new EntityBuilder()
-                .type(GameEntityTypes.CANNON)
+                .type(DeadAcresEntityType.CANNON)
                 .at(x, y)
                 .viewWithBBox("cannon.png")
                 .with(new CollidableComponent(true))
@@ -68,11 +70,26 @@ public class GameEntityFactory implements EntityFactory {
         ProjectileComponent projectileComponent = new ProjectileComponent(new Point2D(dirX,dirY),bulletSpeed);
 
         new EntityBuilder()
-                .type(GameEntityTypes.BULLET)
+                .type(DeadAcresEntityType.BULLET)
                 .at(x, y)
                 .viewWithBBox("blast.png")
                 .with(new CollidableComponent(true))
-                .with(projectileComponent)
+                .with(projectileComponent).with(new Component() {
+
+                    private Point2D startPosition;
+
+                    @Override
+                    public void onAdded() {
+                        startPosition = entity.getPosition();
+                    }
+
+                    @Override
+                    public void onUpdate(double tpf) {
+                        if (entity.getPosition().distance(startPosition) >= 200) {
+                            entity.removeFromWorld();
+                        }
+                    }
+                })
                 .buildAndAttach();
     }
 
@@ -84,7 +101,7 @@ public class GameEntityFactory implements EntityFactory {
         double height = image.getHeight();
 
         return new EntityBuilder()
-                .type(GameEntityTypes.WALL)
+                .type(DeadAcresEntityType.WALL)
                 .at(x, y)
                 .view(fileName)
                 .bbox(new HitBox(new Point2D(0, -11), BoundingShape.box(width, height)))
@@ -99,10 +116,32 @@ public class GameEntityFactory implements EntityFactory {
         double height = image.getHeight();
 
         return new EntityBuilder()
-                .type(GameEntityTypes.PLANTS)
+                .type(DeadAcresEntityType.PLANTS)
                 .at(x, y)
                 .view(fileName)
                 .bbox(new HitBox(new Point2D(0, -11), BoundingShape.box(width, height)))
+                .with(new CollidableComponent(true))
+                .buildAndAttach();
+    }
+
+    @Spawns("blood")
+    public Entity createBlood(double x, double y) {
+
+        return new EntityBuilder()
+                .type(DeadAcresEntityType.PLANTS)
+                .at(x, y)
+                .view("blood.png")
+                .with(new CollidableComponent(true))
+                .buildAndAttach();
+    }
+
+    @Spawns("smoke")
+    public Entity createBombSmoke(double x, double y) {
+
+        return new EntityBuilder()
+                .type(DeadAcresEntityType.PLANTS)
+                .at(x, y)
+                .view("explosion-smoke.png")
                 .with(new CollidableComponent(true))
                 .buildAndAttach();
     }
@@ -114,7 +153,7 @@ public class GameEntityFactory implements EntityFactory {
         double height = image.getHeight();
 
         return new EntityBuilder()
-                .type(GameEntityTypes.BRICK)
+                .type(DeadAcresEntityType.BRICK)
                 .at(x, y)
                 .view(fileName)
                 .bbox(new HitBox(new Point2D(0, -11), BoundingShape.box(width, height)))
@@ -133,7 +172,7 @@ public class GameEntityFactory implements EntityFactory {
         texture.loop();
 
         return new EntityBuilder()
-                .type(GameEntityTypes.ANIMATED_OBJECT)
+                .type(DeadAcresEntityType.ANIMATED_OBJECT)
                 .at(x, y)
                 .view(texture)
                 .bbox(new HitBox(new Point2D(0, 0), BoundingShape.box(frameWidth, frameHeight)))
