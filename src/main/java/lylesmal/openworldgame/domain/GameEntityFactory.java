@@ -19,11 +19,22 @@ import static com.almasb.fxgl.dsl.FXGLForKtKt.image;
 
 public class GameEntityFactory implements EntityFactory {
 
-    @Spawns("character")
-    public Entity createCharacter() {
+    @Spawns("player")
+    public Entity createControllablePlayer() {
         return new EntityBuilder()
-                .type(GameEntityTypes.PLAYER)
+                .type(GameEntityTypes.CONTROLLABLE_PLAYER)
                 .at(75,60)
+                .view("character.png")
+                .bbox(new HitBox("PLAYER", BoundingShape.box(16, 16)))
+                .with(new CollidableComponent(true))
+                .zIndex(10)
+                .buildAndAttach();
+    }
+    @Spawns("zombie")
+    public Entity createZombieCharacter(double x, double y) {
+        return new EntityBuilder()
+                .type(GameEntityTypes.ZOMBIE)
+                .at(x, y)
                 .view("character.png")
                 .bbox(new HitBox("CHARACTER", BoundingShape.box(16, 16)))
                 .with(new CollidableComponent(true))
